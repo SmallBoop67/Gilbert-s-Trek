@@ -26,6 +26,11 @@ class Load extends Phaser.Scene {
         // The multiatlas was created using TexturePacker and the Kenny
         // Particle Pack asset pack.
         this.load.multiatlas("kenny-particles", "kenny-particles.json");
+
+        this.load.audio('coinSound', 'Mario Coin Sound - Sound Effect (HD) 4.mp3');
+        this.load.audio('fnaf', 'FNAF_ Kids Cheering - Gaming Sound Effect (HD) 4.mp3');
+        this.load.audio('jump', 'Mario Jump - Sound Effect (HD) 4.mp3');
+        this.load.audio('death', 'Roblox Death Sound (Oof) - Sound Effect (HD) 4.mp3');
     }
 
     create() {

@@ -29,7 +29,7 @@ let config = {
             }
         }
     },
-    width: 1440,
+    width: 2200,
     height: 900,
     scene: [Load, Platformer]
 }
