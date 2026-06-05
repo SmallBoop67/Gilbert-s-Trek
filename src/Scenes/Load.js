@@ -31,6 +31,7 @@ class Load extends Phaser.Scene {
         this.load.audio('fnaf', 'FNAF_ Kids Cheering - Gaming Sound Effect (HD) 4.mp3');
         this.load.audio('jump', 'Mario Jump - Sound Effect (HD) 4.mp3');
         this.load.audio('death', 'Roblox Death Sound (Oof) - Sound Effect (HD) 4.mp3');
+        this.load.audio('fall', 'metal pipe falling sound effect.mp3');
     }
 
     create() {

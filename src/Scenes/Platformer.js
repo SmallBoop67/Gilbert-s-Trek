@@ -12,6 +12,8 @@ class Platformer extends Phaser.Scene {
         this.PARTICLE_VELOCITY = 50;
         this.SCALE = 2.0;
         this.score = 0;
+        this.isDead = false;
+
         
     }
 
@@ -77,11 +79,45 @@ class Platformer extends Phaser.Scene {
         
 
         // set up player avatar
-        my.sprite.player = this.physics.add.sprite(30, 345, "platformer_characters", "tile_0000.png");
+        my.sprite.player = this.physics.add.sprite(30, 370, "platformer_characters", "tile_0000.png");
         my.sprite.player.setCollideWorldBounds(true);
+        my.sprite.enemy = this.physics.add.sprite(600, 370, "platformer_characters", "tile_0015.png");
+        my.sprite.enemy.setCollideWorldBounds(true);
+
+        my.sprite.enemyUpDown = this.physics.add.sprite(950, 70, "platformer_characters", "tile_0011.png");
+        my.sprite.enemyUpDown.setCollideWorldBounds(true);
+        my.sprite.enemyUpDown.body.setAllowGravity(false); // ignore gravity so it can move up
+        my.sprite.enemyUpDown.setVelocityY(80);
+
+        this.physics.add.overlap(my.sprite.player, my.sprite.enemyUpDown, () => {
+            this.playerHitSpike(my.sprite.player, null);
+        }, null, this);
+
+        my.sprite.enemyUpDown2 = this.physics.add.sprite(1060, 70, "platformer_characters", "tile_0011.png");
+        my.sprite.enemyUpDown2.setCollideWorldBounds(true);
+        my.sprite.enemyUpDown2.body.setAllowGravity(false); // ignore gravity so it can move up
+        my.sprite.enemyUpDown2.setVelocityY(80);
+
+        this.physics.add.overlap(my.sprite.player, my.sprite.enemyUpDown2, () => {
+            this.playerHitSpike(my.sprite.player, null);
+        }, null, this);
+
+        my.sprite.enemyUpDown3 = this.physics.add.sprite(1170, 70, "platformer_characters", "tile_0011.png");
+        my.sprite.enemyUpDown3.setCollideWorldBounds(true);
+        my.sprite.enemyUpDown3.body.setAllowGravity(false); // ignore gravity so it can move up
+        my.sprite.enemyUpDown3.setVelocityY(80);
+
+        this.physics.add.overlap(my.sprite.player, my.sprite.enemyUpDown3, () => {
+            this.playerHitSpike(my.sprite.player, null);
+        }, null, this);
 
         // Enable collision handling
         this.physics.add.collider(my.sprite.player, this.groundLayer);
+        this.physics.add.collider(my.sprite.enemy, this.groundLayer);
+
+        this.physics.add.overlap(my.sprite.player, my.sprite.enemy, () => {
+            this.playerHitSpike(my.sprite.player, null);
+        }, null, this);
 
         this.physics.add.collider(
             my.sprite.player,
@@ -110,10 +146,11 @@ class Platformer extends Phaser.Scene {
             emitting: false
         });
 
-        this.coinSound = this.sound.add('coinSound');
-        this.fnaf = this.sound.add('fnaf');
-        this.jump = this.sound.add('jump');
-        this.death = this.sound.add('death');
+        this.coinSound = this.sound.add('coinSound', { volume: 0.4 });
+        this.fnaf = this.sound.add('fnaf', { volume: 0.8 });
+        this.jump = this.sound.add('jump', { volume: 0.2 });
+        this.death = this.sound.add('death', { volume: 0.7 });
+        this.fall = this.sound.add('fall', { volume: 0.5 });
 
 
         // TODO: Add coin collision handler
@@ -167,6 +204,49 @@ class Platformer extends Phaser.Scene {
     }
 
     update() {
+        const speed = 70; // adjust as needed
+        if (my.sprite.enemy.x < my.sprite.player.x) {
+            my.sprite.enemy.setVelocityX(speed);
+            my.sprite.enemy.setFlipX(true); // facing right
+        } else {
+            my.sprite.enemy.setVelocityX(-speed);
+            my.sprite.enemy.setFlipX(false); // facing left
+        }
+        const upSpeed = 120;
+        const downSpeed = -80;
+        const topLimit = 70;    
+        const bottomLimit = 170; 
+
+        if (my.sprite.enemyUpDown.y <= topLimit) {
+            my.sprite.enemyUpDown.setVelocityY(upSpeed);
+             my.sprite.enemyUpDown.setTexture("platformer_characters", "tile_0012.png");
+            this.fall.play();
+
+        } else if (my.sprite.enemyUpDown.y >= bottomLimit) {
+            my.sprite.enemyUpDown.setVelocityY(downSpeed);
+             my.sprite.enemyUpDown.setTexture("platformer_characters", "tile_0011.png");
+
+        }
+
+        if (my.sprite.enemyUpDown2.y <= topLimit) {
+            my.sprite.enemyUpDown2.setVelocityY(upSpeed);
+             my.sprite.enemyUpDown2.setTexture("platformer_characters", "tile_0012.png");
+
+        } else if (my.sprite.enemyUpDown2.y >= bottomLimit) {
+            my.sprite.enemyUpDown2.setVelocityY(downSpeed);
+             my.sprite.enemyUpDown2.setTexture("platformer_characters", "tile_0011.png");
+
+        }
+
+        if (my.sprite.enemyUpDown3.y <= topLimit) {
+            my.sprite.enemyUpDown3.setVelocityY(upSpeed);
+             my.sprite.enemyUpDown3.setTexture("platformer_characters", "tile_0012.png");
+
+        } else if (my.sprite.enemyUpDown3.y >= bottomLimit) {
+            my.sprite.enemyUpDown3.setVelocityY(downSpeed);
+             my.sprite.enemyUpDown3.setTexture("platformer_characters", "tile_0011.png");
+
+        }
         if(cursors.left.isDown) {
             my.sprite.player.setAccelerationX(-this.ACCELERATION);
             my.sprite.player.resetFlip();
@@ -257,13 +337,14 @@ class Platformer extends Phaser.Scene {
     }
 
     playerHitSpike(player, spike) {
-        // 1. Brief visual pause or penalty
+        if (this.isDead) return; // prevent multiple triggers
+        this.isDead = true;
+
         this.physics.pause();
         this.death.play();
 
-        player.setTint(0xff0000); // Turn the player red to show damage
+        player.setTint(0xff0000);
 
-        // 2. Restart the scene after a short delay (e.g., 500 milliseconds)
         this.time.delayedCall(1500, () => {
             this.scene.restart();
         });
