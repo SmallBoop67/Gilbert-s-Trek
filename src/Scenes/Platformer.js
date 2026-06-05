@@ -152,6 +152,9 @@ class Platformer extends Phaser.Scene {
         this.death = this.sound.add('death', { volume: 0.7 });
         this.fall = this.sound.add('fall', { volume: 0.5 });
 
+        this.music = this.sound.add('song', { volume: 0.8, loop: true });
+        this.music.play();
+
 
         // TODO: Add coin collision handler
                 // Handle collision detection with coins
@@ -220,7 +223,6 @@ class Platformer extends Phaser.Scene {
         if (my.sprite.enemyUpDown.y <= topLimit) {
             my.sprite.enemyUpDown.setVelocityY(upSpeed);
              my.sprite.enemyUpDown.setTexture("platformer_characters", "tile_0012.png");
-            this.fall.play();
 
         } else if (my.sprite.enemyUpDown.y >= bottomLimit) {
             my.sprite.enemyUpDown.setVelocityY(downSpeed);
@@ -334,6 +336,25 @@ class Platformer extends Phaser.Scene {
                 color: '#e9e9e9'
             }
         );
+
+        this.add.text(
+            this.cameras.main.worldView.x + 220,
+            this.cameras.main.worldView.y + 110,
+            "Made by Ethan Kwak",
+            {
+                fontSize: '24px',
+                color: '#e9e9e9'
+            }
+        );
+        this.add.text(
+            this.cameras.main.worldView.x + 220,
+            this.cameras.main.worldView.y + 160,
+            "Music from http://youtube.com/watch?v=p8moocGzQJ4",
+            {
+                fontSize: '24px',
+                color: '#e9e9e9'
+            }
+        );
     }
 
     playerHitSpike(player, spike) {
@@ -342,6 +363,7 @@ class Platformer extends Phaser.Scene {
 
         this.physics.pause();
         this.death.play();
+        this.music.stop();
 
         player.setTint(0xff0000);
 
